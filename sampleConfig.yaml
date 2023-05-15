@@ -1,9 +1,11 @@
 ---
-- path: "/a"
+- id: sndk3m23
+  path: "/a"
   algorithm: roundRobin
   sticky: false
   hosts:
-  - protocol: http
+  - id: sdfwe4r
+    protocol: http
     hostname: localhost
     port: 8080
     health:
@@ -13,7 +15,8 @@
     minHealthyHits: 5
     minUnhealthyHits: 6
     hitFrequencyInSeconds: 20
-  - protocol: http
+  - id: sfdjn3ui2
+    protocol: http
     hostname: localhost
     port: 9090
     health:

@@ -6,7 +6,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type Config []struct {
+type Config []BaseConf
+
+type BaseConf struct {
+	UniqueId  string
 	Path      string  `yaml:"path"`
 	Algorithm string  `yaml:"algorithm"`
 	Sticky    bool    `yaml:"sticky"`
@@ -14,6 +17,7 @@ type Config []struct {
 }
 
 type Hosts struct {
+	UniqueId              string
 	Protocol              string `yaml:"protocol"`
 	Hostname              string `yaml:"hostname"`
 	Port                  int    `yaml:"port"`
@@ -29,6 +33,7 @@ type Health struct {
 	Method      string `yaml:"method"`
 }
 
+// ReadConfig reads load balancer configuration at the specified path
 func ReadConfig(path string) Config {
 	file, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -40,4 +45,12 @@ func ReadConfig(path string) Config {
 		panic(err)
 	}
 	return config
+}
+
+func GetUniqueIDByPath(path string) string {
+	return ""
+}
+
+func GetUniqueIdsOfHostsByPath(path string) string {
+	return ""
 }
