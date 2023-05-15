@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// ProxyToServerHandler calls target service and writes response to response writer.
 func ProxyToServerHandler(destinationHost string) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		log.Printf("Received request at: %s\n", time.Now())

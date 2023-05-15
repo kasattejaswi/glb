@@ -55,9 +55,8 @@ func TestProxyToServerHandler(t *testing.T) {
 
 	t.Run("Should return 500 response if target server is down", func(t *testing.T) {
 
-		// create a test server to use as the destination host
-		testServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			panic("")
+		// create a test server which is not running
+		testServer := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		}))
 		defer testServer.Close()
 
