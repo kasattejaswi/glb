@@ -2,11 +2,15 @@ package config
 
 import (
 	"io/ioutil"
+	"sync"
 
+	"github.com/google/uuid"
 	"gopkg.in/yaml.v3"
 )
 
-type Config []BaseConf
+type Config struct {
+	BaseConf []BaseConf
+}
 
 type BaseConf struct {
 	UniqueId  string
@@ -33,24 +37,53 @@ type Health struct {
 	Method      string `yaml:"method"`
 }
 
+var conf Config
+var once sync.Once
+
 // ReadConfig reads load balancer configuration at the specified path
-func ReadConfig(path string) Config {
-	file, err := ioutil.ReadFile(path)
-	if err != nil {
-		panic(err)
-	}
-	var config Config
-	err = yaml.Unmarshal(file, &config)
-	if err != nil {
-		panic(err)
-	}
-	return config
+func GetConfig(path string) *Config {
+	once.Do(func() {
+		file, err := ioutil.ReadFile(path)
+		if err != nil {
+			panic(err)
+		}
+		var baseConf []BaseConf
+		err = yaml.Unmarshal(file, &baseConf)
+		if err != nil {
+			panic(err)
+		}
+		for i, v := range baseConf {
+
+			baseConf[i].UniqueId = uuid.NewString()
+			for j := range v.Hosts {
+				baseConf[i].Hosts[j].UniqueId = uuid.NewString()
+			}
+		}
+		conf = Config{
+			BaseConf: baseConf,
+		}
+	})
+	return &conf
 }
 
 func GetUniqueIDByPath(path string) string {
+	for _, v := range GetConfig("").BaseConf {
+		if v.Path == path {
+			return v.UniqueId
+		}
+	}
 	return ""
 }
 
-func GetUniqueIdsOfHostsByPath(path string) string {
-	return ""
+func GetUniqueIdsOfHostsByPath(path string) []string {
+	result := []string{}
+	for _, v := range GetConfig("").BaseConf {
+		if v.Path == path {
+			for _, h := range v.Hosts {
+				result = append(result, h.UniqueId)
+			}
+			break
+		}
+	}
+	return result
 }
