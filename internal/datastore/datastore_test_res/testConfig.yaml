@@ -1,0 +1,24 @@
+- path: "/a"
+  algorithm: roundRobin
+  sticky: false
+  hosts:
+  - protocol: http
+    hostname: localhost
+    port: 8080
+    health:
+      endpoint: "/health"
+      successCode: 200
+      method: GET
+    minHealthyHits: 5
+    minUnhealthyHits: 6
+    hitFrequencyInSeconds: 20
+  - protocol: http
+    hostname: localhost
+    port: 9090
+    health:
+      endpoint: "/health"
+      successCode: 200
+      method: GET
+    minHealthyHits: 5
+    minUnhealthyHits: 6
+    hitFrequencyInSeconds: 20
