@@ -9,8 +9,8 @@
       endpoint: "/health"
       successCode: 200
       method: GET
-    minHealthyHits: 5
-    minUnhealthyHits: 6
+    minHealthyHits: 2
+    minUnhealthyHits: 1
     hitFrequencyInSeconds: 20
   - protocol: http
     hostname: localhost

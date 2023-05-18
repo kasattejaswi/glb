@@ -49,12 +49,14 @@ func UpdateHealth(id string, isHealthy bool) {
 	r := LoadRegistry()
 	r.Lock()
 	v := r.HealthRegistry[id]
+
 	v.LastChecked = time.Now()
 	if isHealthy {
 		if v.HealthyHitCount+1 == v.HostConfig.MinHealthyHits {
 			v.IsHealthy = true
 			v.HealthyHitCount = 0
 			v.UnhealthyHitCount = 0
+
 		}
 		v.HealthyHitCount++
 	} else {
@@ -65,6 +67,7 @@ func UpdateHealth(id string, isHealthy bool) {
 		}
 		v.UnhealthyHitCount++
 	}
+	r.HealthRegistry[id] = v
 	r.Unlock()
 }
 
