@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"reflect"
+	"sync"
 	"testing"
 
 	"github.com/kasattejaswi/glb/internal/config"
@@ -171,6 +172,34 @@ func TestUpdateHealth(t *testing.T) {
 		}
 	})
 
+}
+
+func TestUpdateHealthConcurrency(t *testing.T) {
+	t.Run("Test registry is thread safe", func(t *testing.T) {
+		var wg sync.WaitGroup
+		wg.Add(2)
+		conf := config.GetConfig("datastore_test_res/testConfig.yaml")
+		// Update health status for host at index 1
+		go func(wg *sync.WaitGroup, conf *config.Config) {
+			UpdateHealth(conf.BaseConf[0].Hosts[0].UniqueId, true)
+			wg.Done()
+		}(&wg, conf)
+		go func(wg *sync.WaitGroup, conf *config.Config) {
+			for i := 1; i <= 4; i++ {
+				UpdateHealth(conf.BaseConf[0].Hosts[1].UniqueId, true)
+			}
+			wg.Done()
+		}(&wg, conf)
+		wg.Wait()
+		r := LoadRegistry()
+		if r.HealthRegistry[conf.BaseConf[0].Hosts[0].UniqueId].HealthyHitCount != 1 {
+			t.Errorf("Expected healthy hit counts to be 1, but got %v", r.HealthRegistry[conf.BaseConf[0].Hosts[0].UniqueId].HealthyHitCount)
+		}
+
+		if r.HealthRegistry[conf.BaseConf[0].Hosts[1].UniqueId].HealthyHitCount != 4 {
+			t.Errorf("Expected healthy hit counts to be 4, but got %v", r.HealthRegistry[conf.BaseConf[0].Hosts[0].UniqueId].HealthyHitCount)
+		}
+	})
 }
 
 func TestDecideHitEndpoint(t *testing.T) {
