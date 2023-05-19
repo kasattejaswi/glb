@@ -174,5 +174,49 @@ func TestUpdateHealth(t *testing.T) {
 }
 
 func TestDecideHitEndpoint(t *testing.T) {
+	// load config
+	conf := config.GetConfig("datastore_test_res/testConfig.yaml")
 
+	t.Run("Should return healthy host at index 1", func(t *testing.T) {
+		// Mark endpoint at index 0 as healthy by updating it as healthy twice
+		UpdateHealth(conf.BaseConf[0].Hosts[0].UniqueId, true)
+		UpdateHealth(conf.BaseConf[0].Hosts[0].UniqueId, true)
+
+		e, ok := DecideHitEndpoint([]string{conf.BaseConf[0].Hosts[0].UniqueId, conf.BaseConf[0].Hosts[1].UniqueId})
+		// ok should be true
+		if !ok {
+			t.Errorf("Expected ok, got not ok")
+		}
+
+		if e.UniqueId != conf.BaseConf[0].Hosts[0].UniqueId {
+			t.Errorf("Expected host ID be %v, Actual %v", conf.BaseConf[0].Hosts[0].UniqueId, e.UniqueId)
+		}
+	})
+
+	t.Run("Should return not ok if no host is healthy", func(t *testing.T) {
+		// Mark host at index 0 as unhealthy
+		UpdateHealth(conf.BaseConf[0].Hosts[0].UniqueId, false)
+
+		_, ok := DecideHitEndpoint([]string{conf.BaseConf[0].Hosts[0].UniqueId, conf.BaseConf[0].Hosts[1].UniqueId})
+		// ok should be true
+		if ok {
+			t.Errorf("Expected not ok, got ok")
+		}
+	})
+
+	t.Run("Should return second host if first one is unhealthy and second on is healthy", func(t *testing.T) {
+		// Mark host at index 1 as healthy
+		for i := 1; i <= 5; i++ {
+			UpdateHealth(conf.BaseConf[0].Hosts[1].UniqueId, true)
+		}
+		e, ok := DecideHitEndpoint([]string{conf.BaseConf[0].Hosts[0].UniqueId, conf.BaseConf[0].Hosts[1].UniqueId})
+		// ok should be true
+		if !ok {
+			t.Errorf("Expected ok, got not ok")
+		}
+
+		if e.UniqueId != conf.BaseConf[0].Hosts[1].UniqueId {
+			t.Errorf("Expected host ID be %v, Actual %v", conf.BaseConf[0].Hosts[1].UniqueId, e.UniqueId)
+		}
+	})
 }

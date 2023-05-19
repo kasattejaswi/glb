@@ -11,8 +11,9 @@ import (
 // All data is retained until the service is running. On shutdown, the data will be lost.
 // The data that load balancer stores does not need persistence.
 
-// IsHealthyRegistry stores live health data of available services. The key is the unique ID of each host generated at load balancer startup.
+// Registry stores live health data of available services. The key is the unique ID of each host generated at load balancer startup.
 type Registry struct {
+	// RWMutex makes it thread safe since multiple Go Routines will be accessing it at the same time
 	sync.RWMutex
 	HealthRegistry map[string]HealthStatus
 }
