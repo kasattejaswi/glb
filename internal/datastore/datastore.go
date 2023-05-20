@@ -1,6 +1,9 @@
 package datastore
 
 import (
+	"encoding/json"
+	"fmt"
+	"net/http"
 	"sync"
 	"time"
 
@@ -15,15 +18,15 @@ import (
 type Registry struct {
 	// RWMutex makes it thread safe since multiple Go Routines will be accessing it at the same time
 	sync.RWMutex
-	HealthRegistry map[string]HealthStatus
+	HealthRegistry map[string]HealthStatus `json:"registry"`
 }
 type HealthStatus struct {
-	HostConfig        config.Hosts
-	LastChecked       time.Time
-	IsHealthy         bool
-	HealthyHitCount   int
-	UnhealthyHitCount int
-	LastHitAt         time.Time
+	HostConfig        config.Hosts `json:"hostConfig"`
+	LastChecked       time.Time    `json:"lastChecked"`
+	IsHealthy         bool         `json:"isHealthy"`
+	HealthyHitCount   int          `json:"healthyHitCount"`
+	UnhealthyHitCount int          `json:"unhealthyHitCount"`
+	LastHitAt         time.Time    `json:"lastHitAt"`
 }
 
 var registry Registry
@@ -82,4 +85,16 @@ func DecideHitEndpoint(hostUniqueIds []string) (hostConfig config.Hosts, ok bool
 		}
 	}
 	return config.Hosts{}, false
+}
+
+func LoadRegistryEndpoints() {
+	config.LoadMux().Handle("/glb/health", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		registry := LoadRegistry()
+		b, e := json.Marshal(registry)
+		if e != nil {
+			fmt.Fprintf(w, "error loading registry: %v", e)
+		}
+		w.Header().Add("Content-Type", "application/json")
+		fmt.Fprint(w, string(b))
+	}))
 }

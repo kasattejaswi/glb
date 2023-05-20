@@ -21,14 +21,14 @@ type BaseConf struct {
 }
 
 type Hosts struct {
-	UniqueId              string
-	Protocol              string `yaml:"protocol"`
-	Hostname              string `yaml:"hostname"`
-	Port                  int    `yaml:"port"`
-	Health                Health `yaml:"health"`
-	MinHealthyHits        int    `yaml:"minHealthyHits"`
-	MinUnhealthyHits      int    `yaml:"minUnhealthyHits"`
-	HitFrequencyInSeconds int    `yaml:"hitFrequencyInSeconds"`
+	UniqueId              string `json:"uniqueId"`
+	Protocol              string `yaml:"protocol" json:"protocol"`
+	Hostname              string `yaml:"hostname" json:"hostname"`
+	Port                  int    `yaml:"port" json:"port"`
+	Health                Health `yaml:"health" json:"health"`
+	MinHealthyHits        int    `yaml:"minHealthyHits" json:"minHealthyHits"`
+	MinUnhealthyHits      int    `yaml:"minUnhealthyHits" json:"minUnhealthyHits"`
+	HitFrequencyInSeconds int    `yaml:"hitFrequencyInSeconds" json:"hitFrequencyInSeconds"`
 }
 
 type Health struct {
