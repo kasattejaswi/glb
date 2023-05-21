@@ -143,6 +143,65 @@ The `health` property defines the health check configuration for the host. It de
 
     Example: `hitFrequencyInSeconds: 5`
 
+## Health check
+This load balancer runs at port `8000`. If you need to see what hosts are healthy and what hosts are unhealthy, you can perform a `GET` request to the endpoint `/glb/health` as below:
+
+### Sample request
+```shell
+curl 'localhost:8000/glb/health'
+```
+
+### Sample response
+```json
+{
+    "registry": {
+        "52bc80a6-e915-41e5-acb4-455abe83e474": {
+            "hostConfig": {
+                "uniqueId": "52bc80a6-e915-41e5-acb4-455abe83e474",
+                "protocol": "http",
+                "hostname": "localhost",
+                "port": 8080,
+                "health": {
+                    "Endpoint": "/health",
+                    "SuccessCode": 200,
+                    "Method": "GET"
+                },
+                "minHealthyHits": 2,
+                "minUnhealthyHits": 3,
+                "hitFrequencyInSeconds": 5
+            },
+            "lastChecked": "2023-05-21T15:33:48.292662658+05:30",
+            "isHealthy": false,
+            "healthyHitCount": 0,
+            "unhealthyHitCount": 1,
+            "lastHitAt": "0001-01-01T00:00:00Z"
+        },
+        "edbf3cbe-06ba-4105-a0d9-424fbbe27694": {
+            "hostConfig": {
+                "uniqueId": "edbf3cbe-06ba-4105-a0d9-424fbbe27694",
+                "protocol": "http",
+                "hostname": "localhost",
+                "port": 8081,
+                "health": {
+                    "Endpoint": "/health",
+                    "SuccessCode": 200,
+                    "Method": "GET"
+                },
+                "minHealthyHits": 2,
+                "minUnhealthyHits": 3,
+                "hitFrequencyInSeconds": 5
+            },
+            "lastChecked": "2023-05-21T15:33:48.293621018+05:30",
+            "isHealthy": false,
+            "healthyHitCount": 0,
+            "unhealthyHitCount": 1,
+            "lastHitAt": "0001-01-01T00:00:00Z"
+        }
+    }
+}
+```
+
 ## Limitations
 
 This load balancer is a very basic implementation and may lack many features like more algorithm implementations. But it can be developed over time.
+
